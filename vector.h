@@ -49,6 +49,8 @@ public:
     //(returns the number of elements in the vector)
     const int getSize() const;
 
+    const int getSum() const;
+
     friend std::ostream& operator<<(std::ostream& output, const Vector& vector);
 };
 

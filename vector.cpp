@@ -180,3 +180,11 @@ const int Vector::getMaxElement() {
 const int Vector::getSize() const {
     return size;
 }
+
+const int Vector::getSum() const {
+    int sum = 0;
+    for (size_t i = 0; i < size; ++i) {
+        sum += data[i];
+    }
+    return sum;
+}
