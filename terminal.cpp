@@ -416,10 +416,15 @@ void Terminal::operateExcel(Excel &excel, std::ifstream &iFile, const Vector _co
         }
         
         else if (symbol == '\n') {
-            cout << "REACHEDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDD" << endl;
-            excel.setElementInMatrix(i , j, cellValue.c_str(), CellType::Default);
-            cellValue.clear();
-            j++;
+            if (cellValue.empty()) {
+                excel.setElementInMatrix(i, j, "0", CellType::Default);
+                j++;
+            }
+            else {
+                excel.setElementInMatrix(i , j, cellValue.c_str(), CellType::Default);
+                cellValue.clear();
+                j++;
+            }
             while (j < excelColumns) {
                 excel.setElementInMatrix(i, j, "0", CellType::Default);
                 j++;                
@@ -444,28 +449,12 @@ void Terminal::operateExcel(Excel &excel, std::ifstream &iFile, const Vector _co
             if (iFile.peek() == '\"') {
                 specialQuoteOpened = !specialQuoteOpened;
                 iFile.ignore(1);
+                cellValue += '\"';
             }
         }
         
         else if (symbol == '\"' && !specialQuoteOpened) {
             quoteOpened = !quoteOpened;
-        }
-
-        else if (iFile.eof()) {
-            cout << "AAAAAAAAAAAAAAAAAAA FINALLY" << endl;
-        }
-
-        else if (iFile.eof() && i != excelRows && j != excelColumns) {
-            int remainingCells =  excelRows * excelColumns - (i * excelColumns - j);
-            std::cout << "REMAINING CELLS: " << remainingCells << endl;
-            for (size_t k = 0; k < remainingCells; ++k) {
-                excel.setElementInMatrix(i, j, "0", CellType::Default);
-                j++;
-                if (j == excelColumns) {
-                    j = 0;
-                    i++;
-                }
-            }
         }
 
         else if (symbol == ' ' && (quoteOpened || specialQuoteOpened)) {
@@ -476,16 +465,32 @@ void Terminal::operateExcel(Excel &excel, std::ifstream &iFile, const Vector _co
             cellValue += symbol;
         }
 
-        else if (iFile.eof()) {
+        else if (iFile.eof() == std::ifstream::traits_type::eof()) {
             cout << "FOR THE LOVE OF GOD" << endl;
-        }
-
-        else if (iFile.peek() == std::ifstream::traits_type::eof()) {
-            cout << "PLEASEEEEEEEEEEEEEEE" << endl;
         }
 
         else {
             cellValue += symbol;
+        }
+
+    }
+
+    if (iFile.eof() && i != excelRows && j != excelColumns) {
+        if (cellValue.empty()) {
+            excel.setElementInMatrix(i, j, "0", CellType::Default);
+            j++;
+        }
+        else {
+            excel.setElementInMatrix(i, j, cellValue.c_str(), CellType::Default);
+            j++;
+        }
+        int remainingCells = excelColumns - j;
+        cout << "I: " << i << ' ' << "J: " << j << endl;
+        cout << "REMAINING CELLS: " << remainingCells << endl;
+        cout << "ex col: " << excelColumns << ' ' << "ex rows: " << excelRows << endl;
+        for (size_t k = 0; k < remainingCells; ++k) {
+            excel.setElementInMatrix(i, j, "0", CellType::Default);
+            j++;
         }
     }
 
