@@ -163,10 +163,18 @@ char** Terminal::processInputIntoArray(const char* input) { //delete dynamic mem
     return inputArray;
 }
 
-const bool Terminal::isLineValid(const std::string& line) const {
+const std::string Terminal::isLineValid(const std::string& line) const {
     bool quoteOpened = false;
     bool dotFound = false;
     bool specialQuoteOpened = false;
+
+    int currentRow = 0;
+    int currentColumn = 0;
+
+    bool isValid = true;
+    std::string errorMessage;
+    std::string tempString;
+
     for (size_t i = 0; i < line.size(); ++i) {
         char current = line[i];
         cout << "current: " << current << endl;
@@ -175,6 +183,10 @@ const bool Terminal::isLineValid(const std::string& line) const {
         switch (current)
         {
         case ',':
+            if (!quoteOpened && !specialQuoteOpened) {
+                currentColumn++;
+                cout << "COLUMN: " << currentColumn << endl;
+            }
             if (quoteOpened) {
                 break;
             }
@@ -182,28 +194,32 @@ const bool Terminal::isLineValid(const std::string& line) const {
                 break;
             }
             if (!(next == '=' || next == '+' || next == '-' || next == '\\' ||next == '\"' || isDigit(next) || next == ',' || next == '\0' || next == '\n')) {
-                return false;
+                isValid = false;
             }
             dotFound = false;
             break;
         case '=':
             if (next != '=') {
-                return false;
+                isValid = false;
+                break;
             }
             break;
         case '!':
             if (next != '=') {
-                return false;
+                isValid = false;
+                break;
             }
             break;
         case '<':
             if (next != '=' && !isDigit(next)) {
-                return false;
+                isValid = false;
+                break;
             }
             break;
         case '>':
             if (next != '=' && !isDigit(next)) {
-                    return false;
+                isValid = false;
+                break;
             }
             break;
         case '\"' :
@@ -217,13 +233,21 @@ const bool Terminal::isLineValid(const std::string& line) const {
             if (quoteOpened) {
                 quoteOpened = false;
                 if (next != ',' && i + 1 < line.size()) {
-                    return false;
+                    isValid = false;
+                    break;
                 }
             }
             else {
                 quoteOpened = true;
             }
             break;
+
+        case '\n' :
+            cout << "SPECIAL CASE" << endl;
+            currentRow++;
+            currentColumn = 0;
+            break;
+
         case '\\' :
             if (i + 1 < line.size() && next == '\"') {
                 // this is your special \" case
@@ -234,8 +258,9 @@ const bool Terminal::isLineValid(const std::string& line) const {
                 if (specialQuoteOpened) {
                     specialQuoteOpened = false;
                     
-                    if (i + 2 < line.size()) {
-                        return false;
+                    if (i + 3 < line.size()) {
+                        isValid = false;
+                        break;
                     }
                 } 
                 else {
@@ -243,7 +268,8 @@ const bool Terminal::isLineValid(const std::string& line) const {
                 }
             }
             if (!quoteOpened && next != '\"') {
-                return false;
+                isValid = false;
+                break;
             }
             break;
 
@@ -254,11 +280,17 @@ const bool Terminal::isLineValid(const std::string& line) const {
             if (specialQuoteOpened) {
                 break;
             }
+            if (!quoteOpened && !specialQuoteOpened && isDigit(next)) {
+                break;
+            }
+
             else if (!quoteOpened && !isDigit(next) && !specialQuoteOpened) {
-                return false;
+                isValid = false;
+                break;
             }
             if (dotFound) {
-                return false;
+                isValid = false;
+                break;
             }
             dotFound = true;
             break;
@@ -267,14 +299,22 @@ const bool Terminal::isLineValid(const std::string& line) const {
                 current != '=' && current != '+' && current != '-' &&
                 current != '<' && current != '>' && current != '.' &&
                 current != '\0' && current != '\n') {
-                    return false;
+                    isValid = false;
+                    break;
                 }
             break;
         }
     }
+    cout << "Row: " << currentRow << ' ' << "Col: " << currentColumn << endl; 
     // The quote should be closed and no dot should be found
     // at the end of a valid line
-    return !quoteOpened && !dotFound && !specialQuoteOpened;
+    if (!quoteOpened && !dotFound && !specialQuoteOpened && isValid) {
+        return "1";
+    }
+    else {
+        tempString += std::to_string(currentRow) + ' ' + std::to_string(currentColumn) + ' ' + errorMessage;
+        return tempString;
+    }
 }
 
 const bool Terminal::isFileValid(std::ifstream& iFile) const {
@@ -287,10 +327,15 @@ const bool Terminal::isFileValid(std::ifstream& iFile) const {
     std::string input;
     std::string newInput;
 
+    std::string isLineValidString;
+
     while (std::getline(iFile, input)) {
         newInput = removeSpacesFromString(input);
-        if (!isLineValid(newInput)) {
-            return false;
+        newInput += '\n';
+        isLineValidString = isLineValid(newInput);
+        if (isLineValidString != "1") {
+            cout << "Error message: " << isLineValidString << endl;
+            return false;// HANDLE RETURN ERROR MESSAGE
         }
     }
     return true;
@@ -392,12 +437,6 @@ void Terminal::importDataIntoExcel(std::ifstream& iFile) { //TO DO readTextFile
         return;
     }
 
-    //delete this part when finished
-    // cout << "Number of Rows: " << commaArray.getSize() << endl;
-    // for (size_t i = 0; i < commaArray.getSize(); ++i) {
-    //     cout << "Number of commas in row " << i << ' ' << commaArray[i] << endl;
-    // }
-
     const int newRows = commaArray.getSize();
     const int newColumns = commaArray.getMaxElement() + 1;
     // cout << "Number of Columns: " << newColumns << endl;
@@ -436,7 +475,7 @@ void Terminal::operateExcel(Excel &excel, std::ifstream &iFile, const Vector _co
 
         else if (symbol == '\n') {
             if (cellValue.empty()) {
-                excel.setElementInMatrix(i, j, "0", CellType::Default);
+                excel.setElementInMatrix(i, j, "", CellType::Default);
             }
             else {
                 setCellBasedOnType(excel, cellValue, i, j);
@@ -444,7 +483,7 @@ void Terminal::operateExcel(Excel &excel, std::ifstream &iFile, const Vector _co
             cellValue.clear();
             j++;
             while (j < excelColumns) {
-                excel.setElementInMatrix(i, j, "0", CellType::Default);
+                excel.setElementInMatrix(i, j, "", CellType::Default);
                 j++;                
             }
             i++;
@@ -453,7 +492,7 @@ void Terminal::operateExcel(Excel &excel, std::ifstream &iFile, const Vector _co
         
         else if (symbol == ',' && !specialQuoteOpened && !quoteOpened) {
             if (cellValue.empty()) {
-                excel.setElementInMatrix(i, j, "0", CellType::Default);
+                excel.setElementInMatrix(i, j, "", CellType::Default);
                 j++;
             }
             else {
@@ -490,7 +529,7 @@ void Terminal::operateExcel(Excel &excel, std::ifstream &iFile, const Vector _co
 
     if (iFile.eof()) {
         if (cellValue.empty()) {
-            excel.setElementInMatrix(i, j, "0", CellType::Default);
+            excel.setElementInMatrix(i, j, "", CellType::Default);
             j++;
         }
         else {
@@ -501,7 +540,7 @@ void Terminal::operateExcel(Excel &excel, std::ifstream &iFile, const Vector _co
         int remainingCells = excelColumns - j;
 
         for (size_t k = 0; k < remainingCells; ++k) {
-            excel.setElementInMatrix(i, j, "0", CellType::Default);
+            excel.setElementInMatrix(i, j, "", CellType::Default);
             j++;
         }
     }

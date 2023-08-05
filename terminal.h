@@ -25,7 +25,7 @@ public:
     //processes an input into a char** array where each separate word is a different pointer
     char** processInputIntoArray(const char* input);
 
-    const bool isLineValid(const std::string& line) const;
+    const std::string isLineValid(const std::string& line) const;
 
     const bool isFileValid(std::ifstream& iFile) const;
     //opens a text file, and returns the name of the text file
