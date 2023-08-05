@@ -18,8 +18,10 @@ public:
     void changeEditMode(const bool _editMode) { editMode = _editMode; }
     const bool getEditMode() const { return editMode; }
 
+    //sets the corresponding cell type to the cell
+    void setCellBasedOnType(Excel& _excel, const std::string& cellValue, const int _rows, const int _columns);
     //reads the opened textFile
-    void processTextFileIntoExcel(std::ifstream& iFile);
+    void importDataIntoExcel(std::ifstream& iFile);
     //processes an input into a char** array where each separate word is a different pointer
     char** processInputIntoArray(const char* input);
 

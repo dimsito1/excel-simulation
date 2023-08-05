@@ -18,13 +18,35 @@ const bool isLetter(const char ch) {
     
 }
 
-const bool isValidNumber(const char* charNumber){
-    for (size_t i = 0; i < strlen(charNumber); i++){
-        if (charNumber[i] < '0' || charNumber[i] > '9'){
-            return false;
+const bool isValidNumber(const char* charNumber) {
+    size_t len = strlen(charNumber);
+    bool hasDot = false;
+    for (size_t i = 0; i < len; i++) {
+        if (charNumber[i] < '0' || charNumber[i] > '9') {
+            if (i == 0 && len > 1 && (charNumber[i] == '-' || charNumber[i] == '+')) {
+                // Allow a leading minus or plus sign
+                continue;
+            }
+            else if (charNumber[i] == '.' && !hasDot && i > 0 && i < len - 1) {
+                // Allow one dot, but not at the beginning or end
+                hasDot = true;
+            }
+            else {
+                return false;
+            }
         }
     }
     return true;
+}
+
+const bool isDouble(const char* charNumber){
+    bool isDouble = false;
+    for (size_t i = 0; i < strlen(charNumber); i++){
+        if (charNumber[i] == '.') {
+            isDouble = true;
+        }
+    }
+    return isDouble;
 }
 
 std::string removeExtraSpacesFromString(const std::string& string) {
@@ -318,12 +340,12 @@ const char* Terminal::openTextFile(const char* input) {
     cout << "File opened successfully." << endl;
     cout << "Excel loaded successfully." << endl;
 
-    processTextFileIntoExcel(iFile);
+    importDataIntoExcel(iFile);
     iFile.close();
 }
 
 
-void Terminal::processTextFileIntoExcel(std::ifstream& iFile) { //TO DO readTextFile
+void Terminal::importDataIntoExcel(std::ifstream& iFile) { //TO DO readTextFile
     if (!iFile) {
         cerr << "ERROR OPENING FILE ( readTextFile )" << endl;
         cerr << "Error state: " << iFile.rdstate() << endl;
@@ -361,8 +383,6 @@ void Terminal::processTextFileIntoExcel(std::ifstream& iFile) { //TO DO readText
             commaCounter = 0;
         }
     }
-
-    cout << "COMMA ARRAY: " << commaArray.getSum() << endl;
 
     if (iFile.eof()) {
         commaArray.pushBack(commaCounter);
@@ -410,21 +430,19 @@ void Terminal::operateExcel(Excel &excel, std::ifstream &iFile, const Vector _co
     std::string cellValue;
 
     while (iFile.get(symbol)) {
-        if (i == excelRows && j == excelColumns) {
-            cout << "END REACHED." << endl;
-            break;
+        if (symbol == ' ' && !quoteOpened && !specialQuoteOpened) {
+            continue;
         }
-        
+
         else if (symbol == '\n') {
             if (cellValue.empty()) {
                 excel.setElementInMatrix(i, j, "0", CellType::Default);
-                j++;
             }
             else {
-                excel.setElementInMatrix(i , j, cellValue.c_str(), CellType::Default);
-                cellValue.clear();
-                j++;
+                setCellBasedOnType(excel, cellValue, i, j);
             }
+            cellValue.clear();
+            j++;
             while (j < excelColumns) {
                 excel.setElementInMatrix(i, j, "0", CellType::Default);
                 j++;                
@@ -439,9 +457,9 @@ void Terminal::operateExcel(Excel &excel, std::ifstream &iFile, const Vector _co
                 j++;
             }
             else {
-            excel.setElementInMatrix(i , j, cellValue.c_str(), CellType::String);
-            j++;
-            cellValue.clear();
+                setCellBasedOnType(excel, cellValue, i, j);
+                j++;
+                cellValue.clear();
             }
         }
         
@@ -465,83 +483,29 @@ void Terminal::operateExcel(Excel &excel, std::ifstream &iFile, const Vector _co
             cellValue += symbol;
         }
 
-        else if (iFile.eof() == std::ifstream::traits_type::eof()) {
-            cout << "FOR THE LOVE OF GOD" << endl;
-        }
-
         else {
             cellValue += symbol;
         }
-
     }
 
-    if (iFile.eof() && i != excelRows && j != excelColumns) {
+    if (iFile.eof()) {
         if (cellValue.empty()) {
             excel.setElementInMatrix(i, j, "0", CellType::Default);
             j++;
         }
         else {
-            excel.setElementInMatrix(i, j, cellValue.c_str(), CellType::Default);
+            setCellBasedOnType(excel, cellValue, i, j);
             j++;
         }
+
         int remainingCells = excelColumns - j;
-        cout << "I: " << i << ' ' << "J: " << j << endl;
-        cout << "REMAINING CELLS: " << remainingCells << endl;
-        cout << "ex col: " << excelColumns << ' ' << "ex rows: " << excelRows << endl;
+
         for (size_t k = 0; k < remainingCells; ++k) {
             excel.setElementInMatrix(i, j, "0", CellType::Default);
             j++;
         }
     }
 
-    // std::string line;
-    // std::string newLine;
-    // std::string quoteLine;
-    // std::cout << "Excel being worked on." << std::endl;
-    // for (size_t i = 0; i < excel.getNumberOfRows(); ++i) {
-    //     std::getline(iFile, line);
-    //     newLine = removeSpacesFromString(line);
-    //     quoteLine = newLine;
-
-    //     size_t startPos = 0;
-    //     size_t j = 0;
-
-    //     while (j < excel.getNumberOfColumns() - 1) {
-    //         size_t quotePos = quoteLine.find('"');
-            
-    //         if (quotePos != std::string::npos) {
-    //             quoteOpened = !quoteOpened;
-    //             quoteLine = quoteLine.substr(quotePos + 1);
-    //         }
-
-    //         size_t commaPos = newLine.find(',', startPos);
-    //         std::string cellValue;
-
-    //         if (commaPos != std::string::npos || !quoteOpened) {
-    //             cellValue = newLine.substr(startPos, commaPos - startPos);
-    //             startPos = commaPos + 1;
-    //         }
-    //         else {
-    //             cellValue = newLine.substr(startPos);
-    //             startPos = newLine.size();
-    //         }
-    //         // If the cell value is empty, set it to "0"
-    //         if (cellValue.empty()) {
-    //             cellValue = "0";
-    //             excel.setElementInMatrix(i, j, "0", CellType::Default);
-    //             j++;
-    //             continue;
-    //         }
-    //         excel.setElementInMatrix(i, j, cellValue.c_str(), CellType::String);
-    //         ++j;
-    //     }
-    //     // If there are still columns remaining, fill them with "0"
-    //     while (j < excel.getNumberOfColumns()) {
-    //         excel.setElementInMatrix(i, j, "0", CellType::Default);
-    //         ++j;
-    //     }
-
-    // }
     cout << "-----SPREADSHEET-----" << endl;
     excel.printSpreadsheet();
     
@@ -555,6 +519,21 @@ void Terminal::operateExcel(Excel &excel, std::ifstream &iFile, const Vector _co
     }
 
     currentExcel = excel;
+}
+
+void Terminal::setCellBasedOnType(Excel& _excel, const std::string& cellValue, const int _rows, const int _columns) {
+    const char* charValue = cellValue.c_str();
+    if (isValidNumber(charValue)) {
+        if (isDouble(charValue)) {
+            _excel.setElementInMatrix(_rows , _columns, charValue, CellType::Double);
+        }
+        else {
+            _excel.setElementInMatrix(_rows , _columns, charValue, CellType::Integer);
+        }
+    }
+    else {
+        _excel.setElementInMatrix(_rows , _columns, charValue, CellType::String);
+    }
 }
 
 void Terminal::processCommand(const char* string, bool& flag) {
