@@ -244,8 +244,10 @@ const std::string Terminal::isLineValid(const std::string& line) const {
 
         case '\n' :
             cout << "SPECIAL CASE" << endl;
+            if (isValid) {
+                currentColumn = 0;
+            }
             currentRow++;
-            currentColumn = 0;
             break;
 
         case '\\' :
