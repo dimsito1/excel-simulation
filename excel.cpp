@@ -192,3 +192,9 @@ void Excel::printExcel() const {
     }
     cout << endl;
 }
+
+void Excel::printTypes() const {
+    for (size_t i = 0; i < rows; ++i) {
+        printCellTypeRow(i);
+    }
+}

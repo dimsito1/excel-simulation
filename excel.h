@@ -38,6 +38,7 @@ public:
 
     void printSpreadsheet() const;
     void printExcel() const;
+    void printTypes() const;
 
     const unsigned getNumberOfRows() const { return rows; };
     const unsigned getNumberOfColumns() const {return columns; };

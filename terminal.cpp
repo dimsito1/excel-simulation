@@ -163,29 +163,33 @@ char** Terminal::processInputIntoArray(const char* input) { //delete dynamic mem
     return inputArray;
 }
 
-const std::string Terminal::isLineValid(const std::string& line) const {
+const std::string Terminal::isLineValid(const std::string& line, const unsigned rowNumber) {
     bool quoteOpened = false;
     bool dotFound = false;
     bool specialQuoteOpened = false;
 
-    int currentRow = 0;
-    int currentColumn = 0;
+    unsigned currentRow = rowNumber;
+    unsigned currentColumn = 0;
 
     bool isValid = true;
+    std::string errorCharacter;
     std::string errorMessage;
     std::string tempString;
 
     for (size_t i = 0; i < line.size(); ++i) {
         char current = line[i];
-        cout << "current: " << current << endl;
+        // cout << "current: " << current << endl;
         char next = i + 1 < line.size() ? line[i + 1] : '\0';
-        // std::cout << "Current char: " << current << endl;
+        std::cout << "Current char: " << current << endl;
         switch (current)
         {
         case ',':
+            dotFound = false;
             if (!quoteOpened && !specialQuoteOpened) {
-                currentColumn++;
-                cout << "COLUMN: " << currentColumn << endl;
+                if (isValid) {
+                    currentColumn++;
+                }
+                break;
             }
             if (quoteOpened) {
                 break;
@@ -194,32 +198,23 @@ const std::string Terminal::isLineValid(const std::string& line) const {
                 break;
             }
             if (!(next == '=' || next == '+' || next == '-' || next == '\\' ||next == '\"' || isDigit(next) || next == ',' || next == '\0' || next == '\n')) {
+                errorMessage = "Wrong use of character \"";
+                errorMessage += next;
+                errorMessage += "\" at: ";
                 isValid = false;
+                goto endOfLoop;
             }
-            dotFound = false;
             break;
         case '=':
-            if (next != '=') {
-                isValid = false;
-                break;
-            }
-            break;
         case '!':
-            if (next != '=') {
-                isValid = false;
-                break;
-            }
-            break;
         case '<':
-            if (next != '=' && !isDigit(next)) {
-                isValid = false;
-                break;
-            }
-            break;
         case '>':
-            if (next != '=' && !isDigit(next)) {
+            if (next != '=') {
+                errorMessage = "Wrong use of character \"";
+                errorMessage += next;
+                errorMessage += "\" at: ";
                 isValid = false;
-                break;
+                goto endOfLoop;
             }
             break;
         case '\"' :
@@ -233,8 +228,11 @@ const std::string Terminal::isLineValid(const std::string& line) const {
             if (quoteOpened) {
                 quoteOpened = false;
                 if (next != ',' && i + 1 < line.size()) {
+                    errorMessage = "Wrong use of character \"";
+                    errorMessage += next;
+                    errorMessage += "\" at: ";
                     isValid = false;
-                    break;
+                    goto endOfLoop;
                 }
             }
             else {
@@ -243,11 +241,17 @@ const std::string Terminal::isLineValid(const std::string& line) const {
             break;
 
         case '\n' :
-            cout << "SPECIAL CASE" << endl;
+            cout << "HERE";
+            if (quoteOpened || specialQuoteOpened) {
+                errorMessage = "Quote not closed at: ";
+                isValid = false;
+                goto endOfLoop;
+            }
             if (isValid) {
                 currentColumn = 0;
             }
-            currentRow++;
+
+            cout << 'a';
             break;
 
         case '\\' :
@@ -260,8 +264,9 @@ const std::string Terminal::isLineValid(const std::string& line) const {
                 if (specialQuoteOpened) {
                     specialQuoteOpened = false;
                     
-                    if (i + 3 < line.size()) {
+                    if (i + 4 < line.size()) {
                         isValid = false;
+
                         break;
                     }
                 } 
@@ -270,8 +275,11 @@ const std::string Terminal::isLineValid(const std::string& line) const {
                 }
             }
             if (!quoteOpened && next != '\"') {
+                errorMessage = "Wrong use of character \"";
+                errorMessage += next;
+                errorMessage += "\" at: ";
                 isValid = false;
-                break;
+                goto endOfLoop;
             }
             break;
 
@@ -282,44 +290,51 @@ const std::string Terminal::isLineValid(const std::string& line) const {
             if (specialQuoteOpened) {
                 break;
             }
-            if (!quoteOpened && !specialQuoteOpened && isDigit(next)) {
-                break;
-            }
-
-            else if (!quoteOpened && !isDigit(next) && !specialQuoteOpened) {
-                isValid = false;
-                break;
-            }
             if (dotFound) {
+                errorMessage = "Wrong use of an extra dot \".\" at: ";
                 isValid = false;
-                break;
+                goto endOfLoop;
             }
             dotFound = true;
+            
+            if (!quoteOpened && !isDigit(next) && !specialQuoteOpened) {
+                errorMessage = "Wrong use of character \"";
+                errorMessage += next;
+                errorMessage += "\" at: ";
+                isValid = false;
+                goto endOfLoop;
+            }
             break;
         default:
             if (!isDigit(current) && !specialQuoteOpened && !quoteOpened &&current != ',' && current != '\"' &&
                 current != '=' && current != '+' && current != '-' &&
                 current != '<' && current != '>' && current != '.' &&
                 current != '\0' && current != '\n') {
+                    errorMessage = "Wrong use of character \"";
+                    errorMessage += current;
+                    errorMessage += "\" at: ";
                     isValid = false;
-                    break;
+                    goto endOfLoop;
                 }
             break;
         }
     }
-    cout << "Row: " << currentRow << ' ' << "Col: " << currentColumn << endl; 
+    endOfLoop:
     // The quote should be closed and no dot should be found
     // at the end of a valid line
     if (!quoteOpened && !dotFound && !specialQuoteOpened && isValid) {
         return "1";
     }
+
     else {
-        tempString += std::to_string(currentRow) + ' ' + std::to_string(currentColumn) + ' ' + errorMessage;
+        tempString += errorMessage + 
+                    '\n' + "Row: " + std::to_string(currentRow + 1) + ", " +
+                    "Column: " + std::to_string(currentColumn + 1);
         return tempString;
     }
 }
 
-const bool Terminal::isFileValid(std::ifstream& iFile) const {
+const bool Terminal::isFileValid(std::ifstream& iFile) {
     if (!iFile) {
         cerr << "ERROR OPENING FILE ( Terminal::isFileValid )" << endl;
         return false;
@@ -330,13 +345,16 @@ const bool Terminal::isFileValid(std::ifstream& iFile) const {
     std::string newInput;
 
     std::string isLineValidString;
+    unsigned rowNumber = 0;
 
     while (std::getline(iFile, input)) {
         newInput = removeSpacesFromString(input);
         newInput += '\n';
-        isLineValidString = isLineValid(newInput);
+        isLineValidString = isLineValid(newInput, rowNumber);
+        rowNumber++;
         if (isLineValidString != "1") {
-            cout << "Error message: " << isLineValidString << endl;
+            cerr << "The spreadsheet you provided was invalid. Please make sure it is valid." << endl;
+            cerr << "Error message- " << isLineValidString << endl;
             return false;// HANDLE RETURN ERROR MESSAGE
         }
     }
@@ -384,8 +402,7 @@ const char* Terminal::openTextFile(const char* input) {
         return nullptr;
     }
 
-    cout << "File opened successfully." << endl;
-    cout << "Excel loaded successfully." << endl;
+    cout << "Text file opened successfully.\n" << endl;
 
     importDataIntoExcel(iFile);
     iFile.close();
@@ -400,7 +417,6 @@ void Terminal::importDataIntoExcel(std::ifstream& iFile) { //TO DO readTextFile
     }
     // checks whether the file is valid
     if (!isFileValid(iFile)) {
-        cerr << "The spreadsheet you provided was invalid. Please make sure it is valid." << endl;
         return; 
     }
 
@@ -547,18 +563,6 @@ void Terminal::operateExcel(Excel &excel, std::ifstream &iFile, const Vector _co
         }
     }
 
-    cout << "-----SPREADSHEET-----" << endl;
-    excel.printSpreadsheet();
-    
-    cout << "-------EXCEL----------" << endl;
-    excel.printExcel();
-
-    cout << "----TYPES-----" << endl;
-
-    for (size_t i = 0; i < excel.getNumberOfRows(); ++i) {
-        excel.printCellTypeRow(i);
-    }
-
     currentExcel = excel;
 }
 
@@ -600,6 +604,7 @@ void Terminal::processCommand(const char* string, bool& flag) {
 
     else if (strcmp(InputArray[0], "print") == 0 && numberOfWords == 1 && validInput(string)) {
         if (editMode) {
+            cout << "----------Excel----------" << endl;
             currentExcel.printExcel();
         }
         else {
@@ -607,6 +612,25 @@ void Terminal::processCommand(const char* string, bool& flag) {
         }
     }
 
+    else  if (strcmp(InputArray[0], "print") == 0 && strcmp(InputArray[1], "spreadsheet") == 0 && numberOfWords == 2 && validInput(string)) {
+        if (editMode) {
+            cout << "-------SPREADSHEET-------" << endl;
+            currentExcel.printSpreadsheet();
+        }
+        else {
+            cerr << "Excel print failed. (you are not in edit mode)" << endl;
+        }
+    }
+
+    else if (strcmp(InputArray[0], "print") == 0 && strcmp(InputArray[1], "types") == 0 && numberOfWords == 2 && validInput(string)) {
+        if (editMode) {
+            cout << "---------Types---------" << endl;
+            currentExcel.printTypes();
+        }
+        else {
+            cerr << "Excel print failed. (you are not in edit mode)" << endl;
+        }
+    }
     else {
         editMode == true ? cerr << "You are in edit mode. (use \"close\" to stop edit mode)" << endl : cerr << "Incorrect input. " << endl;
     }

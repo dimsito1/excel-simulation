@@ -5,8 +5,18 @@
 #ifndef _TERMINAL_HEADER_INCLUDED_
 #define _TERMINAL_HEADER_INCLUDED_
 
+enum class ErrorType {
+    Comma,
+    OpenedQuote,
+    OpenedSpecialQuote,
+    None,
+    Character
+};
 
 class Terminal {
+protected:
+    ErrorType error;
+
 private:
     Excel currentExcel;
 
@@ -25,9 +35,9 @@ public:
     //processes an input into a char** array where each separate word is a different pointer
     char** processInputIntoArray(const char* input);
 
-    const std::string isLineValid(const std::string& line) const;
+    const std::string isLineValid(const std::string& line, const unsigned rowNumber);
 
-    const bool isFileValid(std::ifstream& iFile) const;
+    const bool isFileValid(std::ifstream& iFile);
     //opens a text file, and returns the name of the text file
     const char* openTextFile(const char* input);
 
