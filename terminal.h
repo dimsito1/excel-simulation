@@ -4,19 +4,7 @@
 
 #ifndef _TERMINAL_HEADER_INCLUDED_
 #define _TERMINAL_HEADER_INCLUDED_
-
-enum class ErrorType {
-    Comma,
-    OpenedQuote,
-    OpenedSpecialQuote,
-    None,
-    Character
-};
-
 class Terminal {
-protected:
-    ErrorType error;
-
 private:
     Excel currentExcel;
 
@@ -44,9 +32,10 @@ public:
     const char* createTextFile();
 
     void operateExcel(Excel& excel, std::ifstream& iFile, const Vector _commaArray);
+
+    void editExcel(Excel& excel, std::ofstream& oFile);
     //processes and sorts each corresponding command to its function
     void processCommand(const char* string, bool& flag);
-
 };
 //removes all extra spaces from the string
 std::string removeExtraSpacesFromString(const std::string& string);

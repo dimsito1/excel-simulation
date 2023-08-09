@@ -15,7 +15,6 @@ private:
 private:
     void copyFrom(const Excel& other);
     void erase();
-
     size_t getHighestLengthColumn(const int index) const;
 
 public:
