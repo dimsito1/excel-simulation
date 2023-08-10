@@ -31,6 +31,8 @@ public:
 
     const char* createTextFile();
 
+    const bool isStringValidForCell(std::string& string);
+
     void operateExcel(Excel& excel, std::ifstream& iFile, const Vector _commaArray);
 
     void editExcel(Excel& excel, std::ofstream& oFile);

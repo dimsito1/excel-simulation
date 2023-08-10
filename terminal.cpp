@@ -220,18 +220,6 @@ const std::string Terminal::isLineValid(const std::string& line, const unsigned 
                 goto endOfLoop;
             }
             break;
-        case '=':
-        case '!':
-        case '<':
-        case '>':
-            if (next != '=') {
-                errorMessage = "Wrong use of character \"";
-                errorMessage += next;
-                errorMessage += "\" at: ";
-                isValid = false;
-                goto endOfLoop;
-            }
-            break;
         case '\"' :
             if (quoteShouldNotBeOpened) {
                 errorMessage = "Quote should not be opened at: ";
@@ -600,6 +588,46 @@ void Terminal::operateExcel(Excel &excel, std::ifstream &iFile, const Vector _co
     currentExcel = excel;
 }
 
+const bool Terminal::isStringValidForCell(std::string& string) {
+    bool dotFound = false;
+    size_t size = string.size() - 1;
+    cout << "STRING SIZE:" << size << std::endl;
+
+    if (string[0] == '+' || string[0] == '-' || isDigit(string[0])) {
+        for (size_t i = 1; i < size; ++i) {
+            if (string[i + 1] == '.') {
+                if (i == 0) {
+                    return false;
+                }
+                if (dotFound) {
+                    return false;
+                }
+                dotFound = true;
+            }
+            if (!isDigit(string[i]) && string[i] != '.') {
+                return false;   
+            }
+        }
+        return true;
+    }
+
+    else if (string[0] == '\"' && string[size - 1] == '\"') {
+        cout << "I GOT HERE" << endl;
+        for (size_t i = 1; i < size - 1; ++i) {
+            if (string[i] == '\\' && string[i + 1] == '\"') {
+                i += 2;
+                continue;
+            }
+            else if (string[i] == '\"' && i != size && string[i - 1] != '\\') {
+                return false;
+            }
+        }
+        return true;
+    }
+
+    return false;
+}
+
 void Terminal::setCellBasedOnType(Excel& _excel, const std::string& cellValue, const int _rows, const int _columns) {
     const char* charValue = cellValue.c_str();
     if (isValidNumber(charValue)) {
@@ -616,13 +644,14 @@ void Terminal::setCellBasedOnType(Excel& _excel, const std::string& cellValue, c
 }
 
 void Terminal::editExcel(Excel& excel, std::ofstream& oFile) {
-    cout << ">edit <row> <column> <new_value>" << endl;
+
 }
 
 void Terminal::processCommand(const char* string, bool& flag) {
-    //TO DO: fix the issue when using command "edit"
+    //TO DO: 
     //fix quoteShouldNotBeOpened
     //continue the edit command (use openTextFile())
+    //remove specialQuoteOpened
     const size_t numberOfWords = wordsCounter(string);
     char** InputArray = processInputIntoArray(string);
 
@@ -632,6 +661,26 @@ void Terminal::processCommand(const char* string, bool& flag) {
         freeInputArray(InputArray, numberOfWords);
     }
 
+    else if (strcmp(InputArray[0], "edit") == 0 && numberOfWords > 3 && isDigitInteger(InputArray[1]) && isDigitInteger(InputArray[2])) {
+        if (!editMode) {
+            cerr << "Excel edit failed. (you are not in edit mode)" << endl;
+            freeInputArray(InputArray, numberOfWords);
+            return;
+        }
+        
+        size_t remainingWords = numberOfWords - 3;
+        std::string tempString = "";
+
+        for (size_t i = 0; i < remainingWords; ++i) {
+            tempString += InputArray[3 + i];
+            tempString += ' ';
+        }
+        
+        cout << "TEMPSTRING: " << tempString << endl;
+        cout << std::boolalpha << isStringValidForCell(tempString) << endl;
+
+        freeInputArray(InputArray, numberOfWords);
+    }
     else if (strcmp(InputArray[0], "exit") == 0 && numberOfWords == 1 && validInput(string)) {
         freeInputArray(InputArray, numberOfWords);
         flag = true;
@@ -678,29 +727,6 @@ void Terminal::processCommand(const char* string, bool& flag) {
             cerr << "Excel print failed. (you are not in edit mode)" << endl;
         }
 
-        freeInputArray(InputArray, numberOfWords);
-    }
-
-    else if (strcmp(InputArray[0], "edit") == 0 && isDigitInteger(InputArray[1]) && isDigitInteger(InputArray[2]) && numberOfWords > 3) {
-        cerr << "IM IN YOUR WALLS" << endl;
-        if (!editMode) {
-            cerr << "Excel edit failed. (you are not in edit mode)" << endl;
-            freeInputArray(InputArray, numberOfWords);
-            return;
-        }
-        
-        size_t remainingWords = numberOfWords - 3;
-        std::string tempString = "";
-
-        if (remainingWords < 1) {
-            cerr << "ERROR" << endl;
-            return;
-        }
-        for (size_t i = 0; i < remainingWords; ++i) {
-            tempString += InputArray[3 + i];
-            tempString += ' ';
-        }
-        cout << "TEMPSTRING: " << tempString << endl;
         freeInputArray(InputArray, numberOfWords);
     }
 
