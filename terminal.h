@@ -4,11 +4,15 @@
 
 #ifndef _TERMINAL_HEADER_INCLUDED_
 #define _TERMINAL_HEADER_INCLUDED_
+
 class Terminal {
 private:
     Excel currentExcel;
 
     bool editMode;
+
+private:
+
 
 public:
     Terminal() : editMode(false) {};
@@ -35,7 +39,7 @@ public:
 
     void operateExcel(Excel& excel, std::ifstream& iFile, const Vector _commaArray);
 
-    void editExcel(Excel& excel, std::ofstream& oFile);
+    void editExcel(const char* firstNumber, const char* secondNumber, const char* value);
     //processes and sorts each corresponding command to its function
     void processCommand(const char* string, bool& flag);
 };
@@ -55,5 +59,7 @@ bool charArrEndsCorrectly(const char* input, const char* endInput);
 bool isEmptyFile(std::ifstream& iFile);
 
 bool fileExists(const std::string& filename);
+
+CellType getStringCellType(const char* string);
 
 #endif

@@ -68,7 +68,6 @@ std::string removeExtraSpacesFromString(const std::string& string) {
             newString += string[i];
         }
     }
-
     return newString;
 }
 
@@ -135,6 +134,35 @@ const bool validInput(const char* input) { //while(validInput) {}
 
 bool isEmptyFile(std::ifstream& iFile) {
     return iFile.peek() == std::ifstream::traits_type::eof();
+}
+
+CellType getStringCellType(const char* string) {
+    //assuming the Cell has correct values.
+    for (size_t i = 0; i < strlen(string); i++) {
+        if (string[i] == '\"') {
+            return CellType::String;
+        }
+        if (string[i] == '.') {
+            return CellType::Double;
+        }
+    }
+    return CellType::Integer;
+}
+
+const char* removeQuotationMarks(const char* string) { //fix for \"  \"
+    int len = std::strlen(string);
+    char* result = new char[len + 1];
+    int j = 0;
+
+    for (int i = 0; i < len; i++) {
+        if (string[i] != '"') {
+            result[j] = string[i];
+            j++;
+        }
+    }
+    result[j] = '\0';
+
+    return result;
 }
 
 /******************************************************************************************************/
@@ -377,9 +405,10 @@ const bool Terminal::isFileValid(std::ifstream& iFile) {
     cout << "- print                           : Display the contents." << endl;
     cout << "- print spreadsheet               : Show the spreadsheet format." << endl;
     cout << "- print types                     : Display data types of the contents." << endl;
+    cout << "- edit <row> <column> <new_value> : To edit a cell's value." << endl;
+    cout << "- save                            : Save the current file and it's changes." << endl;
     cout << "- close                           : Close the current file." << endl;
     cout << "- exit                            : To fully exit the whole program." << endl;
-    cout << "- edit <row> <column> <new_value> : To edit a cell's value." << endl;
     cout << "\nPlease enter a command to proceed." << endl;
 
     return true;
@@ -591,7 +620,6 @@ void Terminal::operateExcel(Excel &excel, std::ifstream &iFile, const Vector _co
 const bool Terminal::isStringValidForCell(std::string& string) {
     bool dotFound = false;
     size_t size = string.size() - 1;
-    cout << "STRING SIZE:" << size << std::endl;
 
     if (string[0] == '+' || string[0] == '-' || isDigit(string[0])) {
         for (size_t i = 1; i < size; ++i) {
@@ -643,8 +671,38 @@ void Terminal::setCellBasedOnType(Excel& _excel, const std::string& cellValue, c
     }
 }
 
-void Terminal::editExcel(Excel& excel, std::ofstream& oFile) {
+void Terminal::editExcel(const char* firstNumber, const char* secondNumber, const char* value) {
+    int firstNumberInt;
+    int secondNumberInt;
 
+    cout << "First number: " << firstNumber << endl;
+    cout << "Second number: " << secondNumber << endl;
+
+    try {
+        firstNumberInt = std::stoi(firstNumber);
+        secondNumberInt = std::stoi(secondNumber);
+    } catch(...) {
+        cerr << "In \"edit <row> <column> <new_value>\" row and column should be integers." << endl;
+        return; 
+    }
+
+    if (firstNumberInt > currentExcel.getNumberOfRows() || firstNumberInt < 1
+    || secondNumberInt > currentExcel.getNumberOfColumns() || secondNumberInt < 1) {
+        cerr << "In \"edit <row> <column> <new_value>\" invalid numbers for row and column." << endl;
+        return;
+    }
+
+    if (getStringCellType(value) == CellType::String) {
+        const char* newValue = removeQuotationMarks(value);
+       
+        currentExcel.setElementInMatrix(firstNumberInt - 1, secondNumberInt - 1, newValue, CellType::String);
+       
+        delete newValue;
+    }
+    else {
+        currentExcel.setElementInMatrix(firstNumberInt - 1, secondNumberInt - 1, value, getStringCellType(value));
+
+    }
 }
 
 void Terminal::processCommand(const char* string, bool& flag) {
@@ -678,6 +736,8 @@ void Terminal::processCommand(const char* string, bool& flag) {
         
         cout << "TEMPSTRING: " << tempString << endl;
         cout << std::boolalpha << isStringValidForCell(tempString) << endl;
+
+        editExcel(InputArray[1], InputArray[2], InputArray[3]);
 
         freeInputArray(InputArray, numberOfWords);
     }
