@@ -35,7 +35,7 @@ Cell::~Cell() {
 
 void Cell::setValueAndType(const char* _value, const CellType& _type) {
     if (_value == '\0' ||  _value == nullptr) {
-        std::cerr << "ERROR CANNOT ASSIGN NULL TO VALUE ( Cell::setValue() )" << std::endl;
+        throw std::invalid_argument("ERROR CANNOT ASSIGN NULL TO VALUE ( Cell::setValue() )");
         return;
     }
     delete[] value;
@@ -58,6 +58,8 @@ const char* Cell::getCellTypeChar() const {
         return "String";
     case CellType::Formula:
         return "Formula";
+    case CellType::ERROR:
+        return "Error";
     default:
         return "Default";
     }

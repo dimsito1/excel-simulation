@@ -7,7 +7,8 @@ enum class CellType {
     Double,
     String,
     Formula,
-    Default
+    Default,
+    ERROR
 };
 
 class Cell {

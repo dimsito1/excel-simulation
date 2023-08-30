@@ -25,11 +25,11 @@ public:
 
     Excel(const int _rows, const int _columns);
 
-    void setRows(const int _rows); //fix setters
+    void setRows(const int _rows);
     void setColumns(const int _columns);
 
-    void setElementInMatrix(const int _rows, const int _columns, const char* _value, const CellType _type); //rowPos and columnPos is rows + 1 and columnPos is columns + 1
-    const char* getElementFromMatrix(const int _rows, const int _columns) const;
+    void setElementInMatrix(const int& _rows, const int& _columns, const char* _value, const CellType& _type); //rowPos and columnPos is rows + 1 and columnPos is columns + 1
+    const char* getElementFromMatrix(const int& _rows, const int& _columns) const;
 
     void printRow(const int index) const;
     void printCellTypeRow(const int index) const;
@@ -38,6 +38,8 @@ public:
     void printSpreadsheet() const;
     void printExcel() const;
     void printTypes() const;
+
+    void saveToFile(const char* filename);
 
     const unsigned getNumberOfRows() const { return rows; };
     const unsigned getNumberOfColumns() const {return columns; };
