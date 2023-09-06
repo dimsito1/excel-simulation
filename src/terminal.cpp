@@ -1,6 +1,7 @@
 #include "excel.h"
 #include "terminal.h"
-#include "vector.h"
+#include <vector>
+#include <algorithm>
 #include <string>
 #include <sstream>
 #include <cstring>
@@ -579,7 +580,8 @@ void Terminal::setRowsAndColsExcel(std::ifstream& iFile) { //TO DO readTextFile
     iFile.seekg(0, std::ios::beg); 
 
     size_t commaCounter = 0;
-    Vector commaArray;
+    std::vector<size_t> commaArray;
+    // Vector commaArray;
     char symbol;
     bool quoteOpened = false;
     bool specialQuoteOpened = false;
@@ -599,21 +601,25 @@ void Terminal::setRowsAndColsExcel(std::ifstream& iFile) { //TO DO readTextFile
             commaCounter++;
         }
         else if (symbol == '\n') {
-            commaArray.pushBack(commaCounter);
+            // commaArray.pushBack(commaCounter);
+            commaArray.push_back(commaCounter);
             commaCounter = 0;
         }
     }
 
     if (iFile.eof()) {
-        commaArray.pushBack(commaCounter);
+        // commaArray.pushBack(commaCounter);
+        commaArray.push_back(commaCounter);
     }
     else {
         cerr << "ERROR END OF FILE NOT REACHED ( Terminal::readTextFile )" << endl;
         return;
     }
 
-    const int newRows = commaArray.getSize();
-    const int newColumns = commaArray.getMaxElement() + 1;
+    // const int newRows = commaArray.getSize();
+    const int newRows = commaArray.size();
+    const int newColumns = *std::max_element(commaArray.begin(), commaArray.end());
+    // const int newColumns = commaArray.getMaxElement() + 1;
     // cout << "Number of Columns: " << newColumns << endl;
     
     Excel newExcel(newRows, newColumns);
