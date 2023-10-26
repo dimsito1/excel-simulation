@@ -1,13 +1,13 @@
 cmake_minimum_required(VERSION 3.10)
 
-project(YourProject)
+project(excel)
 
 set(CMAKE_CXX_STANDARD 11)
 set(CMAKE_CXX_STANDARD_REQUIRED True)
 
 include_directories(${CMAKE_SOURCE_DIR}/include)
 
-add_executable(YourProject 
+add_executable(excel 
     src/cell.cpp
     src/excel.cpp
     src/main.cpp
@@ -15,6 +15,8 @@ add_executable(YourProject
     src/terminal.cpp
     src/vector.cpp
 )
+
+install(TARGETS  ${PROJECT_NAME} DESTINATION bin)
 
 file(COPY data/
      DESTINATION ${CMAKE_BINARY_DIR}/data)
