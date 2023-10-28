@@ -20,7 +20,6 @@ int main() {
 
         if(cin.fail()) {
             cin.clear();
-            //идеята за while-a със cin е от интернета
             while (cin.get() != '\n');
             cout << "Error: Input too long. Please enter a shorter command." << endl;
         }
@@ -29,7 +28,7 @@ int main() {
                 terminal.processCommand(input, exit);
             }
             catch(...) {
-                cerr << "Problem occured during runtime." << endl;
+                cerr << "Problem occurred during runtime." << endl;
             }
         }
     }

@@ -70,7 +70,6 @@ const CellType Terminal::getStringCellType(const char* string) const {
 const std::string Terminal::getResultFromFormula(const long double& firstValue, const long double& secondValue, const FormulaType& formulaType) const {
     std::string resultString;
     long double resultNumber = 0.0L;
-    //идеята за използването на oss е от интернет
     std::ostringstream oss;
 
     switch (formulaType)
@@ -529,7 +528,9 @@ const char* Terminal::createTextFile() {
         return nullptr;
     }
 
-    std::ofstream newFile(newInput);
+    std::string filePath = "data/";
+    filePath += newInput;
+    std::ofstream newFile(filePath);
     cout << "New text file \"" << newInput << "\" created successfully." << endl;
     newFile.close();
 
@@ -540,7 +541,9 @@ const char* Terminal::createTextFile() {
 }
 
 void Terminal::openTextFile(const char* input) {
-    std::ifstream iFile(input);
+    std::string filePath = "data/";
+    filePath += input;
+    std::ifstream iFile(filePath);
     if (!iFile) {
         cerr << "The file you provided does not exist."<< endl;
         iFile.close();
@@ -554,7 +557,7 @@ void Terminal::openTextFile(const char* input) {
     
     if (utility::isEmptyFile(iFile)) {
         cerr << "The file you provided is empty." << endl;
-        cerr << "Fill it accordingly then procceed." << endl;
+        cerr << "Fill it accordingly then proceed." << endl;
         return;
     }
 
@@ -846,7 +849,6 @@ void Terminal::runFormulasExcel(Excel& _excel) {
                 char** numbersArray = utility::processInputIntoArray(extractedNumChar);
                 size_t numberOfWords = utility::wordsCounter2(extractedNumChar);
 
-
                 // cout << "FIRST NUMBER:" << numbersArray[0] << '!' << endl;
                 // cout << "SECOND NUMBER:" << numbersArray[1] << '!' << endl;
                 // cout << "THIRD NUMBER:" << numbersArray[2] << '!' << endl;
@@ -929,9 +931,9 @@ void Terminal::runFormulasExcel(Excel& _excel) {
                     _excel.setElementInMatrix(i, j, finalValue.c_str(), CellType::ERROR);
                     return;
                 }
-                CellType finalCelltype = getStringCellType(finalValue.c_str());
+                CellType finalCellType = getStringCellType(finalValue.c_str());
 
-                _excel.setElementInMatrix(i, j, finalValue.c_str(), finalCelltype);
+                _excel.setElementInMatrix(i, j, finalValue.c_str(), finalCellType);
             }
         }
     }
@@ -1079,7 +1081,6 @@ void Terminal::processCommand(const char* string, bool& flag) {
 }
 
 void Terminal::printWelcomeMessage() const {
-    //изобраьението е генерирано онлайн
     cout << "Welcome to-" << endl;
     cout << "  ______              _  _____ _                 _       _   _              "         << endl;
     cout << " |  ____|            | |/ ____(_)               | |     | | (_)             "         << endl;
