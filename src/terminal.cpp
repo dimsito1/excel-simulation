@@ -528,7 +528,7 @@ const char* Terminal::createTextFile() {
         return nullptr;
     }
 
-    std::string filePath = "data/";
+    std::string filePath = "../data/";
     filePath += newInput;
     std::ofstream newFile(filePath);
     cout << "New text file \"" << newInput << "\" created successfully." << endl;
@@ -541,7 +541,7 @@ const char* Terminal::createTextFile() {
 }
 
 void Terminal::openTextFile(const char* input) {
-    std::string filePath = "data/";
+    std::string filePath = "../data/";
     filePath += input;
     std::ifstream iFile(filePath);
     if (!iFile) {
@@ -563,12 +563,12 @@ void Terminal::openTextFile(const char* input) {
 
     currentFileName = input;
 
-    setRowsAndColsExcel(iFile);
+    createExcelFromFile(iFile);
     iFile.close();
 }
 
 
-void Terminal::setRowsAndColsExcel(std::ifstream& iFile) { //TO DO readTextFile
+void Terminal::createExcelFromFile(std::ifstream& iFile) { //TO DO readTextFile
     if (!iFile) {
         cerr << "ERROR OPENING FILE ( readTextFile )" << endl;
         cerr << "Error state: " << iFile.rdstate() << endl;
@@ -621,16 +621,16 @@ void Terminal::setRowsAndColsExcel(std::ifstream& iFile) { //TO DO readTextFile
 
     // const int newRows = commaArray.getSize();
     const int newRows = commaArray.size();
-    const int newColumns = *std::max_element(commaArray.begin(), commaArray.end());
+    const int newColumns = *std::max_element(commaArray.begin(), commaArray.end()) + 1;
     // const int newColumns = commaArray.getMaxElement() + 1;
     // cout << "Number of Columns: " << newColumns << endl;
     
     Excel newExcel(newRows, newColumns);
 
-    importDataIntoExcel(newExcel, iFile);
+    setExcelDataFromFile(newExcel, iFile);
 }
 
-void Terminal::importDataIntoExcel(Excel &excel, std::ifstream &iFile) {
+void Terminal::setExcelDataFromFile(Excel &excel, std::ifstream &iFile) {
     changeEditMode(true);
 
     iFile.clear(); // Clear any flags

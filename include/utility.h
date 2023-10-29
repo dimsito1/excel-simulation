@@ -23,7 +23,7 @@ namespace utility {
     bool validInput(const char* input);
     const char* makeStringValueForCell(const char* string);
     const char* fixFileString(const char* string);
-    //от stackoverflow->
+    
     inline bool isEmptyFile(std::ifstream& iFile) {
         return iFile.peek() == std::ifstream::traits_type::eof();
     }

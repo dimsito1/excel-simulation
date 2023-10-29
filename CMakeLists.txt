@@ -27,7 +27,3 @@ target_include_directories(excel
 
 # Install executable to usr/local/bin with command "sudo make install"
 install(TARGETS excel DESTINATION bin)
-
-# Copy data files to the build directory
-file(COPY data/
-     DESTINATION ${CMAKE_BINARY_DIR}/data)

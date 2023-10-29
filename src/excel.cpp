@@ -190,7 +190,9 @@ void Excel::printTypes() const {
 }
 
 void Excel::saveToFile(const char* filename) {
-    std::ofstream oFile(filename);
+    std::string filePath = "../data/";
+    filePath += filename;
+    std::ofstream oFile(filePath);
 
     if (!oFile) {
         cerr << "Something wrong with file to be saved" << endl;

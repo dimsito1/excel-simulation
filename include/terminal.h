@@ -26,14 +26,14 @@ private:
 private:
     void changeEditMode(bool _editMode) { editMode = _editMode; }
     void setCellBasedOnType(Excel& _excel, const std::string& cellValue, const int _rows, const int _columns);
-    void setRowsAndColsExcel(std::ifstream& iFile);
+    void createExcelFromFile(std::ifstream& iFile);
     const std::string isLineValid(const std::string& line, const unsigned rowNumber) const;
     bool isFileValid(std::ifstream& iFile) const;
     void openTextFile(const char* input);
     const char* createTextFile();
     bool getEditMode() const { return editMode; }
     bool isStringValidForCell(std::string& string);
-    void importDataIntoExcel(Excel& excel, std::ifstream& iFile);
+    void setExcelDataFromFile(Excel& excel, std::ifstream& iFile);
     void runFormulasExcel(Excel& _excel);
     void editExcel(const char* firstNumber, const char* secondNumber, const char* value);
     void getErrorMessage(std::string& errorMessage, const char errorChar) const;
