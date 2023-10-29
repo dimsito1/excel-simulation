@@ -10,9 +10,11 @@ set(CMAKE_CXX_STANDARD_REQUIRED ON)
 set(SOURCES
     src/cell.cpp
     src/excel.cpp
+    src/excelManager.cpp
     src/main.cpp
     src/terminal.cpp
     src/utility.cpp
+    src/validator.cpp
     src/vector.cpp
 )
 

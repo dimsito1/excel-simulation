@@ -1,14 +1,16 @@
 #include "terminal.h"
+#include "excelManager.h"
+#include "excel.h"
 
 using std::endl;
 using std::cin;
 using std::cout;
 using std::cerr;
 
-
 int main() {
-
-    Terminal terminal;
+    Excel excel;
+    ExcelManager em(excel);
+    Terminal terminal(em);
     terminal.printWelcomeMessage();
 
     char input[256];

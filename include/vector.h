@@ -1,8 +1,9 @@
-#include <iostream>
-#include <initializer_list>
 
 #ifndef _VECTOR_HEADER_INCLUDED_
 #define _VECTOR_HEADER_INCLUDED_
+
+#include <iostream>
+#include <initializer_list>
 
 class Vector{
 private:

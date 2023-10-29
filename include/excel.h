@@ -1,10 +1,11 @@
+
+#ifndef _EXCEL_HEADER_INCLUDED_
+#define _EXCEL_HEADER_INCLUDED_
+
 #include <iostream>
 #include <cstring>
 #include <fstream>
 #include "cell.h"
-
-#ifndef _EXCEL_HEADER_INCLUDED_
-#define _EXCEL_HEADER_INCLUDED_
 
 class Excel {
 private:    

@@ -4,11 +4,147 @@
 #include <cstring>
 #include <iostream>
 #include "utility.h"
+#include "cell.h"
+#include "formulaType.h"
+#include "validator.h"
 
 using std::endl;
 using std::cin;
 using std::cout;
 using std::cerr;
+
+void utility::getErrorMessage(std::string& errorMessage, const char errorChar) {
+    errorMessage = "Wrong use of character \"";
+    errorMessage += errorChar;
+    errorMessage += "\" at: ";
+}
+
+const std::string utility::getResultFromFormula(const long double& firstValue, const long double& secondValue, const FormulaType& formulaType) {
+    std::string resultString;
+    long double resultNumber = 0.0L;
+    std::ostringstream oss;
+
+    switch (formulaType)
+    {
+    case FormulaType::Addition:
+        resultNumber = firstValue + secondValue;
+        oss << resultNumber;
+        resultString = oss.str();
+        break;
+
+    case FormulaType::Subtraction:
+        resultNumber = firstValue - secondValue;
+        oss << resultNumber;
+        resultString = oss.str();
+        break;
+
+    case FormulaType::BiggerOrEqualThan:
+        if (firstValue >= secondValue) {
+            resultString += '1';
+            break;
+        }
+        resultString += '0';
+        break;
+
+    case FormulaType::BiggerThan:
+        if (firstValue > secondValue) {
+            resultString += '1';
+            break;
+        }
+        resultString += '0';
+        break;
+
+    case FormulaType::Division:
+        if (secondValue == 0) {
+            resultString += "ERROR";
+            break;
+        }
+        resultNumber = firstValue / secondValue;
+        oss << resultNumber;
+        resultString = oss.str();
+        break;
+
+    case FormulaType::Multiplication:
+        resultNumber = firstValue * secondValue;
+        oss << resultNumber;
+        resultString = oss.str();
+        break;
+
+    case FormulaType::SmallerOrEqualThan:
+        if (firstValue <= secondValue) {
+            resultString += '1';
+            break;
+        }
+        resultString += '0';
+        break;
+
+    case FormulaType::SmallerThan:
+        if (firstValue < secondValue) {
+            resultString += '1';
+            break;
+        }
+        resultString += '0';
+        break;
+    }
+    
+    return resultString;
+}
+
+const FormulaType utility::getFormulaType(const char firstChar, const char secondChar) {
+    if (secondChar == '0') {
+        switch (firstChar)
+        {
+        case '+':
+            return FormulaType::Addition;
+        case '-':
+            return FormulaType::Subtraction;
+        case '*':
+            return FormulaType::Multiplication;
+        case '/':
+            return FormulaType::Division;
+        case '<':
+            return FormulaType::SmallerThan;
+        case '>':
+            return FormulaType::BiggerThan;
+        default:
+        // Handle unexpected characters
+            cerr << "Error unsupported formula type." << endl;
+            return FormulaType::None;
+        }
+    } 
+    else {
+        switch (firstChar)
+        {
+        case '<':
+            return FormulaType::SmallerOrEqualThan;
+        case '>':
+            return FormulaType::SmallerOrEqualThan;
+        default:
+        // Handle unexpected characters
+            cerr << "Error unsupported formula type." << endl;
+            return FormulaType::None;
+        }
+    }
+}
+
+const CellType utility::getStringCellType(const char* string)  {
+    //assuming the Cell has correct values.
+    if (string[0] == 'R') {
+        return CellType::Formula;
+    }
+    for (size_t i = 0; i < strlen(string); i++) {
+        if (string[i] == '\"') {
+            return CellType::String;
+        }
+        if (string[i] == '.') {
+            return CellType::Double;
+        }
+        if (string[i] > '9' || string[i] < 9) {
+            return CellType::String;
+        }
+    }
+    return CellType::Integer;
+}
 
 char** utility::processInputIntoArray(const char* input) {
     //processes for example const char* "open new file" into [[open'\0'][new'\0'][file'\0']]
@@ -44,24 +180,6 @@ char** utility::processInputIntoArray(const char* input) {
     return inputArray;
 }
 
-bool utility::boolArrIsAllFalseOrAllTrue(const bool* array, const size_t size) {
-    for (int i = 1; i < size; ++i) {
-        if (array[i] != array[0]) {
-            return false;
-        }
-    }
-    return true;
-}
-
-bool utility::isDigitInteger(const char* number) {
-    for (size_t i = 0; i < strlen(number); ++i) {
-        if (!isDigit(number[i])) {
-            return false;
-        }
-    }
-    return true;
-}
-
 const char* utility::getStringAfterQuote(const char* string) {
     bool quoteFound = false;
     size_t j = 0;
@@ -81,41 +199,10 @@ const char* utility::getStringAfterQuote(const char* string) {
     return newString;
 } 
 
-bool utility::isValidNumber(const char* charNumber) {
-    size_t len = strlen(charNumber);
-    bool hasDot = false;
-    for (size_t i = 0; i < len; i++) {
-        if (charNumber[i] < '0' || charNumber[i] > '9') {
-            if (i == 0 && len > 1 && (charNumber[i] == '-' || charNumber[i] == '+')) {
-                // Allow a leading minus or plus sign
-                continue;
-            }
-            else if (charNumber[i] == '.' && !hasDot && i > 0 && i < len - 1) {
-                // Allow one dot, but not at the beginning or end
-                hasDot = true;
-            }
-            else {
-                return false;
-            }
-        }
-    }
-    return true;
-}
-
-bool utility::isDouble(const char* charNumber){
-    bool isDouble = false;
-    for (size_t i = 0; i < strlen(charNumber); i++){
-        if (charNumber[i] == '.') {
-            isDouble = true;
-        }
-    }
-    return isDouble;
-}
-
 std::string utility::extractNumbersFromString(const std::string& string) {
     std::string newString;
     for (size_t i = 0; i < string.size(); i++) {
-        if (utility::isDigit(string[i])) {
+        if (validate::isDigit(string[i])) {
             newString += string[i];
         } else if (!newString.empty() && newString.back() != ' ') {
             newString += ' ';
@@ -127,7 +214,7 @@ std::string utility::extractNumbersFromString(const std::string& string) {
 std::string utility::extractFormulaFromString(const std::string& string) {
     std::string newString;
     for (size_t i = 0; i < string.size(); i++) {
-        if (!utility::isDigit(string[i]) && string[i] != 'R' && string[i] != 'C') {
+        if (!validate::isDigit(string[i]) && string[i] != 'R' && string[i] != 'C') {
             newString += string[i];
         }
     }
@@ -158,23 +245,6 @@ std::string utility::removeSpacesFromString(const std::string& string) {
         }
     }
     return newString;
-}
-
-bool utility::fileExists(const std::string& filename) {
-    std::ifstream file(filename);
-    return file.good();
-}
-
-bool utility::charArrEndsCorrectly(const char* input, const char* endInput) {
-    size_t sizeInput = strlen(input);
-    size_t sizeEndInput = strlen(endInput);
-
-    for (size_t i = 0; i < sizeEndInput; ++i) {
-        if (input[sizeInput - 1 - i] != endInput[sizeEndInput - 1 - i]) {
-            return false;
-        }
-    }
-    return true;
 }
 
 size_t utility::wordsCounter(const char* input) {
@@ -210,21 +280,6 @@ void utility::freeInputArray(char** inputArray, const size_t numberOfWords) {
         delete[] inputArray[i];
     }
     delete[] inputArray;
-}
-
-bool utility::validInput(const char* input) {
-    size_t length = strlen(input);
-
-    if (input[0] == ' ' || input[length - 1] == ' '){
-        return false;
-    }
-
-    for (size_t i = 0; i < length - 1; ++i) {
-        if (input[i] == ' ' && input[i + 1] == ' ') {
-            return false;
-        }
-    }
-    return true;
 }
 
 const char* utility::makeStringValueForCell(const char* string) {
