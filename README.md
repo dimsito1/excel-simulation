@@ -16,11 +16,11 @@ Table of Contents
 # TXT to Excel conversion explanation
 Text files are converted into a spreadsheet format, interpreting each comma as a cell delimiter:
 
--**Text cells**: Enclosed in parentheses, e.g., **,"Hello",**.
+-**Text cells**: Enclosed in parentheses, like: **,"Hello",**.
 
 -**Number Cells**: Directly inputted, supporting integers, floats, and doubles.
 
--**Formulas**: Defined by cell references and an operator, e.g.,**,R1C1 + R2C2,**. (rows and columns start from 1)
+-**Formulas**: Defined by cell references and an operator, such as: **,R1C1 + R2C2,**. (rows and columns start from 1)
 
 Upon loading or saving, formulas are calculated, considering text cells or out of reach cells as 0. This ensures a seamless transition between the text file and the interactive spreadsheet environment.
 
