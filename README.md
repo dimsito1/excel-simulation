@@ -33,13 +33,13 @@ In the main path type:
 ./configure.sh
 ```
 
-then
+build it,
 
 ```shell
 ./build.sh
 ```
 
-and finally
+and run it,
 
 ```shell
 ./run.sh
@@ -63,7 +63,7 @@ cmake ..
 make
 ```
 
-and finally
+and execute it,
 
 ```shell
 ./excel.exe
@@ -82,7 +82,7 @@ You can exit the program at any time using the exit command.
 # Available Commands
 Below is a list of commands available in the Excel Simulation project:
 
-1. print
+**1**. print
 
 Displays the content of the currently opened spreadsheet in a presentable manner.
 
@@ -91,7 +91,7 @@ Displays the content of the currently opened spreadsheet in a presentable manner
 
 ```
 
-2. print types
+**2**. print types
 
 Displays the data types of the contents in each cell of the spreadsheet.
 
@@ -99,7 +99,7 @@ Displays the data types of the contents in each cell of the spreadsheet.
 >print types
 ```
 
-3. edit <row> <column> <new_value> (rows and columns start from 1)
+**3**. edit <row> <column> <new_value> (rows and columns start from 1)
 
 Edits the value of a cell in the spreadsheet using integer values for rows and columns.
 
@@ -107,7 +107,7 @@ Edits the value of a cell in the spreadsheet using integer values for rows and c
 >edit 1 2 150
 ```
 
-4. save
+**4**. save
 
 Saves any changes made to the currently opened file.
 
@@ -115,15 +115,15 @@ Saves any changes made to the currently opened file.
 >save
 ```
 
-5. close
+**5**. close
 
-Closes the currently opened file, ensuring all changes are saved.
+Closes the currently opened file, ensuring all changes are saved, if command **save** has not been called the changes would not be saved.
 
 ```shell
 >close
 ```
 
-6. exit
+**6**. exit
 
 Exits the Excel Simulation program.
 
@@ -132,10 +132,8 @@ Exits the Excel Simulation program.
 ```
 
 # How to Contribute
-
 If you would like to contribute to the project or report issues, please feel free to open an issue or submit a pull request on our GitHub repository.
 License
 
 # License
-
 This project is licensed under the MIT License.

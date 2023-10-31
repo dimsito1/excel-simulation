@@ -1,7 +1,5 @@
 /build
 
-*.png
-
 *.d
 
 # Compiled Object files
