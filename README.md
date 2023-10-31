@@ -94,7 +94,7 @@ Displays the data types of the contents in each cell of the spreadsheet.
 >print types
 ```
 
-**3. Edit row_number column_number new_value** (rows and columns start from 1)
+**3. Edit** row_number column_number new_value **(rows and columns start from 1)**
 
 Edits the value of a cell in the spreadsheet using integer values for rows and columns.
 ```shell
