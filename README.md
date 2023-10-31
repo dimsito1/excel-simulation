@@ -13,6 +13,17 @@ Table of Contents
 - **File Saving**: Safeguard your changes by saving your progress back into the text file.
 - **Session Management**: Easily close your current spreadsheet, open another, or exit the program entirely when you're done.
 
+# TXT to Excel conversion explanation
+Text files are converted into a spreadsheet format, interpreting each comma as a cell delimiter:
+
+-**Text cells**: Enclosed in parentheses, e.g., **,"Hello",**.
+
+-**Number Cells**: Directly inputted, supporting integers, floats, and doubles.
+
+-**Formulas**: Defined by cell references and an operator, e.g.,**,R1C1 + R2C2,**. (rows and columns start from 1)
+
+Upon loading or saving, formulas are calculated, considering text cells or out of reach cells as 0. This ensures a seamless transition between the text file and the interactive spreadsheet environment.
+
 # Requirements
 - C++ compiler (e.g., g++)
 - cmake
