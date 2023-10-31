@@ -27,26 +27,24 @@ git clone git@github.com:yourusername/excel-simulation.git
 2. Build the application:
 -if you are using a Linux distro (or Mac)-
 
-In the main path type:
-
+In the main path, type:
 ```shell
 ./configure.sh
 ```
 
 build it,
-
 ```shell
 ./build.sh
 ```
 
 and run it,
-
 ```shell
 ./run.sh
 ```
 
 -if you are using Windows
 
+In the main path, type:
 ```shell
 mkdir build
 ```
@@ -64,7 +62,6 @@ make
 ```
 
 and execute it,
-
 ```shell
 ./excel.exe
 ```
@@ -82,32 +79,29 @@ You can exit the program at any time using the exit command.
 # Available Commands
 Below is a list of commands available in the Excel Simulation project:
 
-**1**. print
+**1. print**
 
 Displays the content of the currently opened spreadsheet in a presentable manner.
-
 ```shell
 >print
 
 ```
 
-**2**. print types
+**2. print types**
 
 Displays the data types of the contents in each cell of the spreadsheet.
-
 ```shell
 >print types
 ```
 
-**3**. edit <row> <column> <new_value> (rows and columns start from 1)
+**3. edit row_number column_number new_value** (rows and columns start from 1)
 
 Edits the value of a cell in the spreadsheet using integer values for rows and columns.
-
 ```shell
 >edit 1 2 150
 ```
 
-**4**. save
+**4. save**
 
 Saves any changes made to the currently opened file.
 
@@ -115,7 +109,7 @@ Saves any changes made to the currently opened file.
 >save
 ```
 
-**5**. close
+**5. close**
 
 Closes the currently opened file, ensuring all changes are saved, if command **save** has not been called the changes would not be saved.
 
@@ -123,10 +117,9 @@ Closes the currently opened file, ensuring all changes are saved, if command **s
 >close
 ```
 
-**6**. exit
+**6. exit**
 
 Exits the Excel Simulation program.
-
 ```shell
 >exit
 ```
