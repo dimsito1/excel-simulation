@@ -1,4 +1,0 @@
-312, "hello Excel", 30, 40, , , , "\" superhero  \"", 
-"ha", "test.txt", 1000, "|\", , , "tst", "sup,er", -333
-+20, "sdsd,sdasfasf21309vmcxv", , 31312312312312319, "test", , , , 
--450, "sureeee", +3435, " \"aaaaaaaaaaaaaaaa \"", 312132, , R1C3 <= R1C3, 120, 0

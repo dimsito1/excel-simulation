@@ -8,16 +8,6 @@
 #include "cell.h"
 
 class Excel {
-private:    
-    Cell** matrix;
-    unsigned rows;
-    unsigned columns;
-
-private:
-    void copyFrom(const Excel& other);
-    void erase();
-    size_t getHighestLengthColumn(const int index) const;
-
 public:
     Excel();
     Excel(const Excel& other);
@@ -25,12 +15,13 @@ public:
     ~Excel();
 
     Excel(const int _rows, const int _columns);
-
-    void setRows(const int _rows);
-    void setColumns(const int _columns);
+    void saveExcelToFile(const char* filename);
 
     void setElementInMatrix(const int& _rows, const int& _columns, const char* _value, const CellType& _type); //rowPos and columnPos is rows + 1 and columnPos is columns + 1
     const char* getElementFromMatrix(const int& _rows, const int& _columns) const;
+
+    const unsigned getNumberOfRows() const { return rows; };
+    const unsigned getNumberOfColumns() const {return columns; };
 
     void printRow(const int index) const;
     void printCellTypeRow(const int index) const;
@@ -40,10 +31,17 @@ public:
     void printExcel() const;
     void printTypes() const;
 
-    void saveToFile(const char* filename);
+private:    
+    Cell** matrix;
+    unsigned rows;
+    unsigned columns;
 
-    const unsigned getNumberOfRows() const { return rows; };
-    const unsigned getNumberOfColumns() const {return columns; };
+private:
+    void copyFrom(const Excel& other);
+    void erase();
+    void setRows(const int _rows);
+    void setColumns(const int _columns);
+    size_t getHighestLengthColumn(const int index) const;
 };
 
 

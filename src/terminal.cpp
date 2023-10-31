@@ -64,7 +64,26 @@ const char* Terminal::createTextFile() {
 }
 
 void Terminal::openTextFile(const char* input) {
-    std::string filePath = "../data/";
+    std::string filePath;
+    // manage root of the project so it has correct execution
+#if defined(_WIN32) || defined(_WIN64)
+    // Windows specific code
+    filePath = "data/";
+#elif defined(__linux__) || defined(__APPLE__)
+    // Linux specific code
+    const char *projectRoot = std::getenv("EXCEL_SIMULATION_ROOT");
+    if (projectRoot) {
+        filePath = projectRoot;
+        filePath += "/data/";
+    } else {
+        filePath = "../data/";
+    }
+#else
+
+    #error "Unknown compiler"
+
+#endif
+
     filePath += input;
     std::ifstream iFile(filePath);
     if (!iFile) {
@@ -186,11 +205,11 @@ void Terminal::processCommand(const char* string, bool& flag) {
 
     else if (strcmp(InputArray[0], "save") == 0 && numberOfWords == 1) {
         if (currEditMode) {
-            em.getExcel().saveToFile(currFileName.c_str());
+            em.getExcel().saveExcelToFile(currFileName.c_str());
             cout << "File saved successfully." << endl;
         }
         else {
-            cerr << "Excel print failed. (you are not in edit mode)" << endl;
+            cerr << "Excel save failed. (you have not edited anything)" << endl;
         }
 
         utility::freeInputArray(InputArray, numberOfWords);

@@ -15,7 +15,6 @@ set(SOURCES
     src/terminal.cpp
     src/utility.cpp
     src/validator.cpp
-    src/vector.cpp
 )
 
 # Add an executable

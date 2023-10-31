@@ -189,13 +189,36 @@ void Excel::printTypes() const {
     }
 }
 
-void Excel::saveToFile(const char* filename) {
-    std::string filePath = "../data/";
+void Excel::saveExcelToFile(const char* filename) {
+    std::string filePath;
+
+    // Check if EXCEL_SIMULATION_ROOT is set
+    const char *projectRoot = std::getenv("EXCEL_SIMULATION_ROOT");
+    if (projectRoot) {
+        // If EXCEL_SIMULATION_ROOT is set, use it to construct the file path
+        filePath = projectRoot;
+        filePath += "/data/";
+    } else {
+        // If EXCEL_SIMULATION_ROOT is not set, assume we are in the build directory
+        // and construct the file path accordingly
+#if defined(_WIN32) || defined(_WIN64)
+    
+    filePath = "..\\data\\";
+#elif defined(__APPLE__) || defined(__linux__)
+    
+    filePath = "../data/";
+#else
+
+    #error "Unknown compiler"
+
+#endif
+    }
+
     filePath += filename;
     std::ofstream oFile(filePath);
 
     if (!oFile) {
-        cerr << "Something wrong with file to be saved" << endl;
+        std::cerr << "Error: Could not open file for saving: " << std::strerror(errno) << std::endl;
         return;
     }
 

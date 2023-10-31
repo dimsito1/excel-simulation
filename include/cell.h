@@ -11,14 +11,6 @@ enum class CellType {
 };
 
 class Cell {
-protected:
-    CellType currCellType;
-    char* value;
-
-private:
-    void copyFrom(const Cell& other);
-    void erase();
-
 public:
     Cell();
     Cell(const Cell& other);
@@ -32,6 +24,15 @@ public:
     const char* getValue() const { return value; }
 
     const char* getCellTypeChar() const;
+    
+protected:
+    CellType currCellType;
+    char* value;
+
+private:
+    void copyFrom(const Cell& other);
+    void erase();
+
 };
 
 

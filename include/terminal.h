@@ -8,13 +8,6 @@
 #include "excelManager.h"
 
 class Terminal {
-private:
-    ExcelManager& em;
-    std::string currFileName;
-
-private:
-    void openTextFile(const char* input);
-    const char* createTextFile();
 
 public:
     Terminal(ExcelManager& _em) : em(_em) {};
@@ -26,6 +19,14 @@ public:
     void processCommand(const char* string, bool& flag);
     void printCommands() const;
     void printWelcomeMessage() const;
+
+private:
+    void openTextFile(const char* input);
+    const char* createTextFile();
+
+private:
+    ExcelManager& em;
+    std::string currFileName;
 };
 
 #endif
