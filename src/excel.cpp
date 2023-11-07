@@ -232,7 +232,7 @@ void Excel::saveExcelToFile(const char* filename) {
             if (matrix[i][j].getCellType() == CellType::String) {
                 const char* fixedTempElement = utility::fixFileString(tempElement);
                 oFile << "\"" << fixedTempElement << "\"";
-                delete fixedTempElement;
+                delete[] fixedTempElement;
             } else {
                 oFile << tempElement;
             }

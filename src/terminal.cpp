@@ -135,7 +135,7 @@ void Terminal::processCommand(const char* string, bool& flag) {
         if (InputArray[3][0] == '\"') {
             const char* newString = utility::getStringAfterQuote(string);
             tempString = newString;
-            delete newString;
+            delete[] newString;
         }
 
         else {

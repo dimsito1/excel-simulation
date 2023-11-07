@@ -32,7 +32,7 @@ void ExcelManager::editExcel(const char* firstNumber, const char* secondNumber, 
         excel.setElementInMatrix(firstNumberInt - 1, secondNumberInt - 1, updatedString, CellType::String);
         cout << "Excel edited successfully." << endl;
 
-        delete updatedString;       
+        delete[] updatedString;
     }
     else {
         excel.setElementInMatrix(firstNumberInt - 1, secondNumberInt - 1, value, utility::getStringCellType(value));
