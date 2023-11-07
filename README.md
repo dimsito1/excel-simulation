@@ -123,10 +123,3 @@ Exits the Excel Simulation program.
 ```shell
 >exit
 ```
-
-# How to Contribute
-If you would like to contribute to the project or report issues, please feel free to open an issue or submit a pull request on our GitHub repository.
-License
-
-# License
-This project is licensed under the MIT License.
